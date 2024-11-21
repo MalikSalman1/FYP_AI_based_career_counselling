@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Model API</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.lecole.edu.pk%2Feducation%2F&psig=AOvVaw29ap_boE6NyDQ4NREGsE3Y&ust=1702198453079000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCICko8T9gYMDFQAAAAAdAAAAABAF') center center/cover no-repeat;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            width: 100%;
+        }
+
+        nav {
+            background-color: #4CAF50;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #predictionForm {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #popup h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #popupResult {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 18px;
+        }
+
+        #popup button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Here You Find the Best Profession for You</h1>
+    </header>
+
+    <nav>
+        <!-- Add navigation links if needed -->
+    </nav>
+
+    <form id="predictionForm">
+        {% set feature_names = [
+            "Database Administrator",
+            "Technical Writer",
+            "Helpdesk Engineer",
+            "Data Scientist",
+            "Customer Service Executive",
+            "Business Analyst",
+            "Software tester",
+            "ML Specialist",
+            "Information Security Specialist",
+            "Hardware Engineer",
+            "Project Manager",
+            "API Specialist",
+            "Software Developer",
+            "Networking Engineer",
+            "Cyber Security Specialist",
+            "Application Support Engineer",
+            "Graphics Designer"
+        ] %}
+        {% for i in range(17) %}
+            <label for="feature{{ i+1 }}">{{ feature_names[i] }}:</label>
+            <select id="feature{{ i+1 }}" name="feature{{ i+1 }}" required>
+                <option value="0">Not Interested</option>
+                <option value="1">Poor</option>
+                <option value="2">Beginner</option>
+                <option value="3">Average</option>
+                <option value="4">Intermediate</option>
+                <option value="5">Excellent</option>
+                <option value="6">Professional</option>
+            </select>
+        {% endfor %}
+
+        <button type="button" onclick="predict()">Predict</button>
+    </form>
+
+    <div id="popup">
+        <h2>Prediction</h2>
+        <p id="popupResult"></p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <script>
+        function predict() {
+            // Fetch values from form
+            var features = [];
+            {% for i in range(17) %}
+                features.push(parseInt(document.getElementById("feature{{ i+1 }}").value));
+            {% endfor %}
+
+            // Make an API request to Flask server
+            fetch(`/predict?${features.map((val, i) => `feature${i+1}=${val}`).join('&')}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display the prediction in the popup
+                    document.getElementById("popupResult").innerText = `Prediction: ${data.prediction}`;
+                    document.getElementById("popup").style.display = "block";
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function closePopup() {
+            // Close the popup
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
+</body>
+</html>
